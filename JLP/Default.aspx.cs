@@ -247,9 +247,22 @@ namespace JLP
             }
         }
 
-        
+        protected void CreateModal_Click(object sender, EventArgs e)
+        {
+            ModalWindow.Visible = true;
+        }
 
-       
+        protected void btnCreate_Click(object sender, EventArgs e)
+        {
+            ModalWindow.Style["display"] = "block";
+        }
 
+        protected void btnInsert_Click(object sender, EventArgs e)
+        {
+            ModalWindow.Style["display"] = "none";
+
+
+
+        }
     }
 }

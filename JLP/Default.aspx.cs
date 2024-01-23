@@ -261,7 +261,16 @@ namespace JLP
         {
             ModalWindow.Style["display"] = "none";
 
+            string invCode = txtInvCode.Text;
+            string desc = txtDescription.Text;
+            int qoh = Convert.ToInt32(txtQuantity.Text);
+            int reorder = Convert.ToInt32(txtReorder.Text);
 
+
+
+
+            //Refresh Table               
+            LoadTable();
 
         }
     }

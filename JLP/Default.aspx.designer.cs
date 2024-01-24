@@ -114,15 +114,6 @@ namespace JLP
         protected global::System.Web.UI.WebControls.TextBox txtReorder;
 
         /// <summary>
-        /// btnInsert control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnInsert;
-
-        /// <summary>
         /// Cancel control.
         /// </summary>
         /// <remarks>
@@ -130,5 +121,14 @@ namespace JLP
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button Cancel;
+
+        /// <summary>
+        /// btnInsert control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnInsert;
     }
 }

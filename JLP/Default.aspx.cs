@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Web;
 using System.Web.UI;
@@ -103,7 +104,7 @@ namespace JLP
             int WidgetID = 0;
             string InvCode = "";
             string Desc = "";
-            int QoH = 0;
+            string QoH = "";
             string ReorderQuantity = "";    //will convert later
 
             try
@@ -124,7 +125,7 @@ namespace JLP
                 //-----Quantity On Hand-----
                 //TempCellValue = WidgetTableGridView.Rows[e.RowIndex].Cells[5].Controls[0] as TextBox;
                 //QoH = Convert.ToInt32(TempCellValue.Text);
-                QoH = Convert.ToInt32(e.NewValues["QuantityOnHand"]?.ToString());
+                QoH = e.NewValues["QuantityOnHand"]?.ToString();
 
                 //-----Reorder Quantity-----
                 //TempCellValue = WidgetTableGridView.Rows[e.RowIndex].Cells[6].Controls[0] as TextBox;
@@ -155,17 +156,14 @@ namespace JLP
         /// 
         /// EXEC UpdateWidget @WID = 6, @ICode = 'InvCode6', @Desc = 'Desc6', @QoH = 78, @ReorderQ = 77
         /// </summary>
-        protected void UpdateRow(int WID, string InvCode, string Desc, int QoH, string Reorder)
+        protected void UpdateRow(int WID, string InvCode, string Desc, string QoH, string Reorder)
         {
-
+            bool isNumeric = false;
+            int iQoH;
+            int iReorder;
             try
             {
-                if (WID == 0)
-                {
-                    Response.Write("Invalid Widget ID");
-                    return;
-                }
-
+                
                 _connection.Open();
 
                 //-----Create Command-----
@@ -179,22 +177,57 @@ namespace JLP
                 cmd.Parameters.AddWithValue("@WID", WID);
 
                 //@ICode                
-                cmd.Parameters.AddWithValue("@ICode", InvCode);
+                if (InvCode.Length <= 50)  //cant be more than 50 chars long
+                {
+                    cmd.Parameters.AddWithValue("@ICode", InvCode);
+                }
+                else
+                {
+                    Response.Write("Inventory Code cannot be more than 50 characters.");
+                    _connection.Close();
+                    return;
+                }
 
                 //@Desc                
-                if (string.IsNullOrEmpty(InvCode)) 
+                if (string.IsNullOrEmpty(Desc)) 
                     cmd.Parameters.AddWithValue("@Desc", DBNull.Value);
                 else
                     cmd.Parameters.AddWithValue("@Desc", Desc);
 
-                //@QoH                
-                cmd.Parameters.AddWithValue("@QoH", QoH);
+                //@QoH
+                isNumeric = int.TryParse(QoH, out iQoH);
+                if (isNumeric)
+                {
+                    cmd.Parameters.AddWithValue("@QoH", iQoH);
+                    isNumeric = false;
+                }
+                else
+                {
+                    Response.Write("Quantity on Hand must be a number");
+                    _connection.Close();
+                    return;
+
+                }
 
                 //@ReorderQ
                 if (string.IsNullOrEmpty(Reorder))
                     cmd.Parameters.AddWithValue("@ReorderQ", DBNull.Value);
                 else
-                    cmd.Parameters.AddWithValue("@ReorderQ", Convert.ToInt32(Reorder));
+                {
+                    isNumeric = int.TryParse(Reorder, out iReorder);
+                    if (isNumeric)
+                    {
+                        cmd.Parameters.AddWithValue("@ReorderQ", (iReorder));
+                    }
+                    else
+                    {
+                        Response.Write("Reorder Quantity must be a number");
+                        _connection.Close();
+                        return;
+                    }
+                }
+
+
 
                 cmd.ExecuteNonQuery();
                 _connection.Close();
@@ -246,11 +279,21 @@ namespace JLP
             }
         }
 
+        /// <summary>
+        /// Show the Modal Window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnCreate_Click(object sender, EventArgs e)
         {
             ModalWindow.Style["display"] = "block";
         }
 
+        /// <summary>
+        /// Insert a row into SQL using stored procedure "NewWidget"
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnInsert_Click(object sender, EventArgs e)
         {
 
@@ -259,11 +302,13 @@ namespace JLP
             string QoH = (txtQuantity.Text);
             int iQoH;
             string Reorder = txtReorder.Text;
+            int iReorder;
             bool isNumeric = false;
 
 
             try
             {
+                //Format:
                 //Exec NewWidget @ICode='adsf', @Desc='fdaddd', @QoH=23, @ReorderQ=45
 
                 _connection.Open();
@@ -275,11 +320,21 @@ namespace JLP
 
                 //-----Add parameters-----
 
-                //@ICode                
-                cmd.Parameters.AddWithValue("@ICode", InvCode);
+                //@ICode
+                if (InvCode.Length <= 50 )  //cant be more than 50 chars long
+                {
+                    cmd.Parameters.AddWithValue("@ICode", InvCode);
+                }
+                else
+                {
+                    Response.Write("Inventory Code cannot be more than 50 characters.");
+                    _connection.Close();
+                    return;
+                }
+                
 
                 //@Desc                
-                if (string.IsNullOrEmpty(InvCode))
+                if (string.IsNullOrEmpty(Desc))
                     cmd.Parameters.AddWithValue("@Desc", DBNull.Value);
                 else
                     cmd.Parameters.AddWithValue("@Desc", Desc);
@@ -289,6 +344,13 @@ namespace JLP
                 if (isNumeric)
                 {
                     cmd.Parameters.AddWithValue("@QoH", iQoH);
+                    isNumeric = false;
+                }
+                else
+                {
+                    Response.Write("Quantity on Hand must be a number");
+                    _connection.Close();
+                    return;
                 }
             
 
@@ -296,7 +358,19 @@ namespace JLP
                 if (string.IsNullOrEmpty(Reorder))
                     cmd.Parameters.AddWithValue("@ReorderQ", DBNull.Value);
                 else
-                    cmd.Parameters.AddWithValue("@ReorderQ", Convert.ToInt32(Reorder));
+                {                    
+                    isNumeric = int.TryParse(Reorder, out iReorder);
+                    if (isNumeric)
+                    {
+                        cmd.Parameters.AddWithValue("@ReorderQ", (iReorder));
+                    }
+                    else
+                    {
+                        Response.Write("Reorder Quantity must be a number");
+                        _connection.Close();
+                        return;
+                    }
+                }
 
                 cmd.ExecuteNonQuery();
                 _connection.Close();
@@ -320,6 +394,11 @@ namespace JLP
             }
         }
 
+        /// <summary>
+        /// Exit out of modal
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnCancel_Click(object sender, EventArgs e)
         {
             //close window

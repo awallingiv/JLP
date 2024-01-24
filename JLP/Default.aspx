@@ -3,8 +3,12 @@
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <header>        
             <style type="text/css">            
-            .WidgetTableGridView > tbody > tr > th, 
-            .WidgetTableGridView > tbody > tr > td { border: 3px ridge black; padding: 5px; text-align: center }         
+            .widget-table-grid-view > tbody > tr > th, 
+            .widget-table-grid-view > tbody > tr > td { 
+                border: 3px ridge black; 
+                padding: 5px; 
+                text-align: center;                
+            }            
             .modal {
                 display: none;
                 padding-top: 5px;                
@@ -44,6 +48,11 @@
                 align-items:center;
                 margin-bottom: 10px;
             }
+            .cancel-button{
+                display:table-row;
+                align-content:flex-start;
+                align-items:flex-end;
+            }
             </style>
     </header>
 
@@ -74,7 +83,7 @@
         <!--Table-->
         <div class="row">            
             <center>                      
-            <asp:GridView ID="WidgetTableGridView" runat="server" AutoGenerateColumns="true" CssClass="WidgetTableGridView" OnRowEditing="WidgetTableGridView_RowEditing" OnRowDeleting="WidgetTableGridView_RowDeleting" OnRowUpdating="WidgetTableGridView_RowUpdating" OnRowCancelingEdit="WidgetTableGridView_RowCancelingEdit" DataKeyNames="WidgetID" GridLines="both">
+            <asp:GridView ID="WidgetTableGridView" runat="server" AutoGenerateColumns="true" CssClass="widget-table-grid-view" OnRowEditing="WidgetTableGridView_RowEditing" OnRowDeleting="WidgetTableGridView_RowDeleting" OnRowUpdating="WidgetTableGridView_RowUpdating" OnRowCancelingEdit="WidgetTableGridView_RowCancelingEdit" DataKeyNames="WidgetID" GridLines="both">
                 <Columns>                    
                     <asp:CommandField ShowEditButton="true" />                    
                     <asp:CommandField ShowDeleteButton="true" />
@@ -116,8 +125,8 @@
                         </div>                                                   
                     </div>
                     <div class="modal-footer">
-                            <asp:Button ID="btnInsert" runat="server" Text="Insert" OnClick="btnInsert_Click"/>
-                            <asp:Button ID="Cancel" runat="server" Text="Cancel" OnClick="btnCancel_Click"/>
+                        <asp:Button ID="Cancel" runat="server" Text="Cancel" CssClass="cancel-button" OnClick="btnCancel_Click"/>
+                        <asp:Button ID="btnInsert" runat="server" Text="Insert" OnClick="btnInsert_Click"/>                            
                     </div>
                 </asp:Panel>                    
             </center>

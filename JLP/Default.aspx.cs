@@ -155,12 +155,12 @@ namespace JLP
         /// 
         /// EXEC UpdateWidget @WID = 6, @ICode = 'InvCode6', @Desc = 'Desc6', @QoH = 78, @ReorderQ = 77
         /// </summary>
-        protected void UpdateRow(int wid, string invcode, string desc, int qoh, string reorder)
+        protected void UpdateRow(int WID, string InvCode, string Desc, int QoH, string Reorder)
         {
 
             try
             {
-                if (wid == 0)
+                if (WID == 0)
                 {
                     Response.Write("Invalid Widget ID");
                     return;
@@ -176,25 +176,25 @@ namespace JLP
                 //-----Add parameters-----
 
                 //@WID
-                cmd.Parameters.AddWithValue("@WID", wid);
+                cmd.Parameters.AddWithValue("@WID", WID);
 
                 //@ICode                
-                cmd.Parameters.AddWithValue("@ICode", invcode);
+                cmd.Parameters.AddWithValue("@ICode", InvCode);
 
                 //@Desc                
-                if (string.IsNullOrEmpty(invcode)) 
+                if (string.IsNullOrEmpty(InvCode)) 
                     cmd.Parameters.AddWithValue("@Desc", DBNull.Value);
                 else
-                    cmd.Parameters.AddWithValue("@Desc", desc);
+                    cmd.Parameters.AddWithValue("@Desc", Desc);
 
                 //@QoH                
-                cmd.Parameters.AddWithValue("@QoH", qoh);
+                cmd.Parameters.AddWithValue("@QoH", QoH);
 
                 //@ReorderQ
-                if (string.IsNullOrEmpty(reorder))
+                if (string.IsNullOrEmpty(Reorder))
                     cmd.Parameters.AddWithValue("@ReorderQ", DBNull.Value);
                 else
-                    cmd.Parameters.AddWithValue("@ReorderQ", Convert.ToInt32(reorder));
+                    cmd.Parameters.AddWithValue("@ReorderQ", Convert.ToInt32(Reorder));
 
                 cmd.ExecuteNonQuery();
                 _connection.Close();
@@ -223,7 +223,7 @@ namespace JLP
             try
             {
                 //Grab widget ID from 4th column
-                WidgetID = WidgetTableGridView.Rows[RowIndex].Cells[3].Text;                
+                WidgetID = WidgetTableGridView.Rows[RowIndex].Cells[2].Text;                
 
                 //open connection
                 _connection.Open();
@@ -242,14 +242,8 @@ namespace JLP
             catch (Exception ex)
             {
                 Response.Write(ex.Message);
-                //Console.WriteLine(ex.Message);
                 _connection.Close();
             }
-        }
-
-        protected void CreateModal_Click(object sender, EventArgs e)
-        {
-            ModalWindow.Visible = true;
         }
 
         protected void btnCreate_Click(object sender, EventArgs e)
@@ -259,19 +253,77 @@ namespace JLP
 
         protected void btnInsert_Click(object sender, EventArgs e)
         {
+
+            string InvCode = txtInvCode.Text;
+            string Desc = txtDescription.Text;
+            string QoH = (txtQuantity.Text);
+            int iQoH;
+            string Reorder = txtReorder.Text;
+            bool isNumeric = false;
+
+
+            try
+            {
+                //Exec NewWidget @ICode='adsf', @Desc='fdaddd', @QoH=23, @ReorderQ=45
+
+                _connection.Open();
+
+                //-----Create Command-----
+                SqlCommand cmd = new SqlCommand("NewWidget", _connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+
+                //-----Add parameters-----
+
+                //@ICode                
+                cmd.Parameters.AddWithValue("@ICode", InvCode);
+
+                //@Desc                
+                if (string.IsNullOrEmpty(InvCode))
+                    cmd.Parameters.AddWithValue("@Desc", DBNull.Value);
+                else
+                    cmd.Parameters.AddWithValue("@Desc", Desc);
+
+                //@QoH
+                isNumeric = int.TryParse(QoH, out iQoH);
+                if (isNumeric)
+                {
+                    cmd.Parameters.AddWithValue("@QoH", iQoH);
+                }
+            
+
+                //@ReorderQ
+                if (string.IsNullOrEmpty(Reorder))
+                    cmd.Parameters.AddWithValue("@ReorderQ", DBNull.Value);
+                else
+                    cmd.Parameters.AddWithValue("@ReorderQ", Convert.ToInt32(Reorder));
+
+                cmd.ExecuteNonQuery();
+                _connection.Close();
+
+                //Clear Fields
+                txtInvCode.Text = "";
+                txtDescription.Text = "";
+                txtQuantity.Text = "";
+                txtReorder.Text = "";
+
+                //close window
+                ModalWindow.Style["display"] = "none";
+
+                //Refresh Table               
+                LoadTable();
+            }
+            catch (Exception ex)
+            {
+                Response.Write(ex.Message);
+                _connection.Close();
+            }
+        }
+
+        protected void btnCancel_Click(object sender, EventArgs e)
+        {
+            //close window
             ModalWindow.Style["display"] = "none";
-
-            string invCode = txtInvCode.Text;
-            string desc = txtDescription.Text;
-            int qoh = Convert.ToInt32(txtQuantity.Text);
-            int reorder = Convert.ToInt32(txtReorder.Text);
-
-
-
-
-            //Refresh Table               
-            LoadTable();
-
         }
     }
 }

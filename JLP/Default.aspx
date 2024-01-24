@@ -116,9 +116,8 @@
                         </div>                                                   
                     </div>
                     <div class="modal-footer">
-                        <center>
-                            <asp:Button ID="btnInsert" runat="server" Text="Insert" OnClick="btnInsert_Click"/>                            
-                        </center>                        
+                            <asp:Button ID="btnInsert" runat="server" Text="Insert" OnClick="btnInsert_Click"/>
+                            <asp:Button ID="Cancel" runat="server" Text="Cancel" OnClick="btnCancel_Click"/>
                     </div>
                 </asp:Panel>                    
             </center>

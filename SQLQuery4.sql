@@ -3,7 +3,7 @@
 --BEGIN
 --	SELECT * FROM Widget Order by WidgetID;
 --END;
-Exec ReadTable;
+--Exec ReadTable;
 
 --Create procedure DeleteWidget
 --	@WID INT
@@ -23,16 +23,24 @@ Exec ReadTable;
 --BEGIN
 --	UPDATE Widget
 --	SET
---		InventoryCode = ISNULL(@ICode, InventoryCode),
+--		InventoryCode = ISNULL(@ICode, InventoryCode),			--Validating null here but will also check in code
 --		Description = @Desc,
 --		QuantityOnHand = ISNULL(@QoH, QuantityOnHand),
 --		ReorderQuantity = @ReorderQ
 --	WHERE WidgetID = @WID;
 --END;
 
-EXEC UpdateWidget @WID = 6, @ICode = 'InvCode6', @Desc = 'Desc6', @QoH = 78, @ReorderQ = 77
+CREATE PROCEDURE NewWidget	
+	@ICode NVARCHAR(50),
+	@Desc NVARCHAR(max) = NULL,
+	@QoH Int,
+	@ReorderQ Int = NULL
+AS
+BEGIN			
+		INSERT INTO Widget(InventoryCode, Description, QuantityOnHand, ReorderQuantity)
+		Values(@Icode, @Desc, @QoH, @ReorderQ)	
+END;
 
 
-Insert into widget (InventoryCode, Description, QuantityOnHand, ReorderQuantity)values ('InvCode4', 'Desc4', 6, 7);
 
 
